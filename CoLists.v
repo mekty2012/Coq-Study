@@ -2,7 +2,6 @@
 
 (* Author : TaeYoung Kim, KAIST SoC *)
 Set Warnings "-notation-overridden,-parsing".
-From LF Require Export Lists.
 
 (* In this chapter, we extend our availability on computation by
    introducing infinite day type and lazy computation. The critical 
@@ -361,9 +360,17 @@ Proof.
     + apply IHelts. assumption.
   Qed.
 
+(* This lemma comes from 
+   http://www.lix.polytechnique.fr/~barras/habilitation/v1/html/full/HF.html *)
+
 (* Here, you will see elim tactic. Since fix is low level tactic
    unlike induction, constrain fails if we use rewrite, subst.
    So we use elim here, that makes coq to preserve constraint. *)
+
+(* One of benefit using fix instead of induction is that, fix can give
+   strong induction. In specific, you can apply induction hypothesis to
+   any subterm of original one, so unlike induction tactic, which only allows
+   direct subterm, we can perform strong induction. *)
 
 (* Now, let's explain cofix. cofix is exactly same as fix, except
    we apply corecursion, not recursion. Constraint is similar to
@@ -607,7 +614,14 @@ Theorem countInfiniteNotFinite :
 Proof.
   Admitted.
 
-
+(* This is end of exercise. There are lots of good exercise
+   problems on coinduction with coq, so I recommend trying them also.
+   For more practical examples, I recomment my currently developing
+   project.
+   https://github.com/mekty2012/Theories-of-Programming-Languages-Implementation/blob/master/Domain.v
+   Here, around definition of DLle, you can see some techniques proving 
+   coinductive definition by introducing induction principle.
+   *)
 
 
 
