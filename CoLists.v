@@ -4,7 +4,7 @@
 Set Warnings "-notation-overridden,-parsing".
 
 (* In this chapter, we extend our availability on computation by
-   introducing infinite day type and lazy computation. The critical 
+   introducing infinite data type and lazy computation. The critical 
    idea are coinductive type and cofixpoint. We begin with Coinductive
    List. *)
 
@@ -22,7 +22,7 @@ Arguments CCons {X} _ _.
    number of data type X. *)
 
 (* If you are familar to category theory, we can explain this
-   idea formaly. An inductive type is initial object of algebra
+   idea formally. An inductive type is initial object of algebra
    category, and coinductive type is final object of coalgebra.
    This is dual of inductive type. In fact, every 'co-' says that
    it is dual of one without 'co-'. You don't need to understand
@@ -110,10 +110,10 @@ Eval compute in (head (constant 3)).
 (* To ensure this property, there is constraint for CoFixpoint
    similar to what Fixpoint had, that recursive call should be
    done on its subterm. Every recursive call of CoFixpoint function
-   should be capsuled be any of constructor of return type. *)
+   should be capsuled by any of constructor of return type. *)
 
 (* Why should this be ensured? It should be allowed to get finite
-   prefix, and to do so, we need do pattern match, which is possible
+   prefix, and to do so, we need to do pattern match, which is possible
    only when we have constructor. *)
 
 
@@ -364,7 +364,7 @@ Proof.
    http://www.lix.polytechnique.fr/~barras/habilitation/v1/html/full/HF.html *)
 
 (* Here, you will see elim tactic. Since fix is low level tactic
-   unlike induction, constrain fails if we use rewrite, subst.
+   unlike induction, constraint fails if we use rewrite, subst.
    So we use elim here, that makes coq to preserve constraint. *)
 
 (* One of benefit using fix instead of induction is that, fix can give
@@ -415,8 +415,13 @@ Proof.
   rewrite break_eqCL. simpl. reflexivity.
   Qed.
 
-(* You maybe tempting to add axiom that bisimilar induces equality, with
-   some of alternative of following lemma. *)
+(* You maybe tempting to add axiom that bisimilar induces equality, 
+
+Axiom bisimilar_eq :
+  forall {X : Type} (cl1 cl2 : CList X),
+  BiSimilar cl1 cl2 -> cl1 = cl2.
+
+   with assurance by following lemma. *)
 
 Lemma bisimilar_prefix :
   forall {X : Type} (n : nat) (cl1 cl2 : CList X),
@@ -606,7 +611,7 @@ Proof.
 Theorem countInfiniteCorrect2 :
   forall l, InfinitelyMany l -> countInfinite l.
 
-   Can you explaim why?
+   Can you explain why?
  *)
 
 Theorem countInfiniteNotFinite :
@@ -616,7 +621,7 @@ Proof.
 
 (* This is end of exercise. There are lots of good exercise
    problems on coinduction with coq, so I recommend trying them also.
-   For more practical examples, I recomment my currently developing
+   For more practical examples, I recommend my currently ongoing
    project.
    https://github.com/mekty2012/Theories-of-Programming-Languages-Implementation/blob/master/Domain.v
    Here, around definition of DLle, you can see some techniques proving 
