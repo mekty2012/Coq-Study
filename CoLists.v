@@ -439,6 +439,26 @@ Proof.
    proposition using cofix. If not, that proposition is only able to reason
    on finite prefix of CList. This case bisimilar_prefix is enough. *)
 
+(* Prove that Bisimilar is equivalence relation. *)
+
+Lemma Bisimilar_refl :
+  forall {X : Type} (cl : CList X),
+  BiSimilarCL cl cl.
+Proof.
+  Admitted.
+
+Lemma Bisimilar_symm :
+  forall {X : Type} (cl1 cl2 : CList X),
+  BiSimilarCL cl1 cl2 -> BiSimilarCL cl2 cl1.
+Proof.
+  Admitted.
+
+Lemma Bisimilar_trans :
+  forall {X : Type} (cl1 cl2 cl3 : CList X),
+  BiSimilarCL cl1 cl2 -> BiSimilarCL cl2 cl3 -> BiSimilarCL cl1 cl3.
+Proof.
+  Admitted.
+
 (* To be used to proof using coinductions, try to give some proof that
    analogous definition you defined to Lists.v and Poly.v are correct. *)
 
@@ -473,7 +493,7 @@ CoInductive InfiniteCL {X : Type} : CoList X -> Prop :=
 From Coq Require Import Omega.
 
 (* Binary CoList is simple implementation of powerset of natural number.
-   You will get good exercise in proving propositions I gaven here. *)
+   You will get good exercise in proving propositions I gave here. *)
 
 CoInductive BiList : Type :=
 | Yes (l : BiList) : BiList
