@@ -1,6 +1,8 @@
 (** CoPoly : Polymorphism with CoInduction *)
 
 (* Author : TaeYoung Kim, KAIST SoC *)
+(* Last Modify at : Jul 23, 2020. *)
+
 Set Warnings "-notation-overridden,-parsing".
 
 (* In this chapter, we extend our availability on computation by
@@ -16,9 +18,9 @@ Arguments CCons {X} _ _.
 
 (* What is this datatype? A CoList is pair of a
    single data and another CoList. It extends idea of
-   list, however we have no base case like nil in 
-   CoList. CoInductive makes us to define possibly 
-   infinite list, like this CList consisting infinite
+   list, however it is infinite data type unlike inductive
+   list. CoInductive makes us to define possibly 
+   infinite data type, like this CList consisting infinite
    number of data type X. *)
 
 (* If you are familar to category theory, we can explain this
@@ -26,7 +28,7 @@ Arguments CCons {X} _ _.
    category, and coinductive type is final object of coalgebra.
    This is dual of inductive type. In fact, every 'co-' says that
    it is dual of one without 'co-'. You don't need to understand
-   this fact to see study this section. *)
+   this fact to study this section. *)
 
 (* Unlike list, where we could create finite list easily, 
    we can't construct colist by definition. Instead, we need to 
@@ -46,7 +48,14 @@ Definition mycolist1 : CList nat :=
 Definition mycolist2 : CList nat :=
   CCons 3 (CCons 2 (CCons 1 mycolist)).
 
-(* Or arbitrary list of number. *)
+(* Also we can reduce list as following. *)
+
+Definition mycolist3 : CList nat :=
+  match mycolist with
+  | CCons _ cl' => cl'
+  end.
+
+(* Or extend by arbitrary list of number. *)
 
 Fixpoint append_list {X : Type} (l : list X) (cl : CList X) : CList X :=
   match l with
