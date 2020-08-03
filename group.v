@@ -29,13 +29,58 @@ Record finite_evid (X : Type) : Type := mk_fin_evid {
   is_unique : NoDup fin_enum
   }.
 
-Record subgroup (G : group) : Type := mk_subgrp {
-  subgr_mem :> G -> Prop;
-  subgr_id : subgr_mem (gr_id G);
-  subgr_op_closed : forall a b,
-    subgr_mem a -> subgr_mem b -> subgr_mem (gr_op G a b);
-  subgr_inv_closed : forall a,
-    subgr_mem a -> subgr_mem (gr_inv G a)
+Record subgroup_bool (G : group) : Type := mk_subgrp_b {
+  subgr_mem_b :> G -> bool;
+  subgr_id_b : subgr_mem_b (gr_id G) = true;
+  subgr_op_closed_b : forall a b,
+    subgr_mem_b a = true -> subgr_mem_b b = true -> subgr_mem_b (gr_op G a b) = true;
+  subgr_inv_closed_b : forall a,
+    subgr_mem_b a = true -> subgr_mem_b (gr_inv G a) = true
+  }.
+
+Record subgroup_bool_els (G : group) (H : subgroup_bool G) : Type := {
+  g :> G; H : H g = true }.
+
+Definition subgroup_bool_op (G : group) (H : subgroup_bool G) :
+  (subgroup_bool_els G H) ->
+  (subgroup_bool_els G H) ->
+  (subgroup_bool_els G H).
+Proof.
+  intros. destruct H. simpl. destruct X. destruct X0.
+  exists (gr_op G g0 g1). apply subgr_op_closed_b0.
+  apply H0. apply H1. Defined.
+
+Definition subgroup_bool_id (G : group) (H : subgroup_bool G) :
+  subgroup_bool_els G H.
+Proof.
+  exists (gr_id G). destruct H. apply subgr_id_b0. Defined.
+
+Definition subgroup_bool_inv (G : group) (H : subgroup_bool G) :
+  subgroup_bool_els G H ->
+  subgroup_bool_els G H.
+Proof.
+  intros. destruct X. destruct H. exists (gr_inv G g0).
+  apply subgr_inv_closed_b0. apply H0. Defined.
+
+Definition subgroup_bool_group (G : group) (H : subgroup_bool G): group.
+Proof.
+  exists (subgroup_bool_els G H) (subgroup_bool_op G H)
+         (subgroup_bool_id G H) (subgroup_bool_inv G H).
+  - (* Associativity *)
+    admit.
+  - admit.
+  - admit.
+  - admit.
+  - admit.
+  Admitted.
+
+Record subgroup_prop (G : group) : Type := mk_subgrp_p {
+  subgr_mem_p :> G -> Prop;
+  subgr_id_p : subgr_mem_p (gr_id G);
+  subgr_op_closed_p : forall a b,
+    subgr_mem_p a -> subgr_mem_p b -> subgr_mem_p (gr_op G a b);
+  subgr_inv_closed_p : forall a,
+    subgr_mem_p a -> subgr_mem_p (gr_inv G a)
   }.
 
 (* Instead of G->Prop, we can choose G->bool. In this case,
@@ -60,3 +105,21 @@ Record subgroup (G : group) : Type := mk_subgrp {
    use.
    https://hott.github.io/HoTT/coqdoc-html/HoTT.Truncations.Core.html
  *)
+
+Record grp_homo (G1 G2 : group) : Type := mk_grp_homo {
+  grp_homo_f :> G1 -> G2;
+  is_homo : forall x y, grp_homo_f (gr_op G1 x y) = gr_op G2 (grp_homo_f x) (grp_homo_f y)
+  }.
+
+Record grp_iso (G1 G2 : group) : Type := mk_grp_iso {
+  grp_iso_f :> grp_homo G1 G2;
+  grp_iso_inj : forall x y, grp_iso_f x = grp_iso_f y -> x = y;
+  grp_iso_sur : forall y, exists x, grp_iso_f x = y
+  }.
+
+
+
+
+
+
+
