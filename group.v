@@ -19,8 +19,8 @@ Record group : Type := mk_grp {
   }.
 
 Record abel_group : Type := mk_abl_grp {
-  gr : group;
-  abelian : forall x y, gr_op gr x y = gr_op gr y x
+  ab_gr : group;
+  ab_abelian : forall x y, gr_op ab_gr x y = gr_op ab_gr y x
   }.
 
 Record finite_evid (X : Type) : Type := mk_fin_evid {
@@ -29,3 +29,34 @@ Record finite_evid (X : Type) : Type := mk_fin_evid {
   is_unique : NoDup fin_enum
   }.
 
+Record subgroup (G : group) : Type := mk_subgrp {
+  subgr_mem :> G -> Prop;
+  subgr_id : subgr_mem (gr_id G);
+  subgr_op_closed : forall a b,
+    subgr_mem a -> subgr_mem b -> subgr_mem (gr_op G a b);
+  subgr_inv_closed : forall a,
+    subgr_mem a -> subgr_mem (gr_inv G a)
+  }.
+
+(* Instead of G->Prop, we can choose G->bool. In this case,
+   Our proof that subgroup is group is simpler. However,
+   this is incorrect definition, since G -> bool is implementation
+   of decidable subsets of G, not any subset of G.
+   
+   If we take G->Prop, another problem happens. If we let our
+   elements for subgroup as (x, subgr_mem x), if we have two different
+   proof for subgr_mem x, we will have duplicate x.
+   
+   By adding proof_irrevalence axiom
+   https://github.com/coq/coq/wiki/CoqAndAxioms
+   we can resolve this. Or, we can restrict subgr_mem to be mere
+   proposition, which is proposition that
+   p q : P -> p = q.
+   I'm not sure on whether this will reduce our choice for subset.
+   
+   Another choice is using truncation. Truncation is operator that
+   receives proposition, and return mere proposition that is logically
+   equivalent to original one. However, it seems this is not easy to
+   use.
+   https://hott.github.io/HoTT/coqdoc-html/HoTT.Truncations.Core.html
+ *)
