@@ -6,6 +6,9 @@ From Coq Require Import Lists.List.
 Import ListNotations.
 From Coq Require Import Omega.
 
+Axiom proof_irrelevance :
+  forall (P : Prop) (p q : P), p = q.
+
 Record group : Type := mk_grp {
   gr_els :> Type;
   gr_op : gr_els -> gr_els -> gr_els;
@@ -39,7 +42,14 @@ Record subgroup_bool (G : group) : Type := mk_subgrp_b {
   }.
 
 Record subgroup_bool_els (G : group) (H : subgroup_bool G) : Type := {
-  g :> G; H : H g = true }.
+  subgr_b_g :> G; subgr_b_H : H subgr_b_g = true }.
+
+Lemma subgrp_bool_els_eq (G : group) (g1 g2 : G) (H : subgroup_bool G)
+                         (H1 : H g1 = true) (H2 : H g2 = true) :
+  g1 = g2 -> {|subgr_b_g:=g1; subgr_b_H:=H1|} = {|subgr_b_g:=g2; subgr_b_H:=H2|}.
+Proof.
+  intro. subst. assert (H1 = H2). { apply proof_irrelevance. }
+  subst. reflexivity. Qed.
 
 Definition subgroup_bool_op (G : group) (H : subgroup_bool G) :
   (subgroup_bool_els G H) ->
@@ -47,8 +57,8 @@ Definition subgroup_bool_op (G : group) (H : subgroup_bool G) :
   (subgroup_bool_els G H).
 Proof.
   intros. destruct H. simpl. destruct X. destruct X0.
-  exists (gr_op G g0 g1). apply subgr_op_closed_b0.
-  apply H0. apply H1. Defined.
+  exists (gr_op G subgr_b_g0 subgr_b_g1). apply subgr_op_closed_b0.
+  apply subgr_b_H0. apply subgr_b_H1. Defined.
 
 Definition subgroup_bool_id (G : group) (H : subgroup_bool G) :
   subgroup_bool_els G H.
@@ -59,20 +69,32 @@ Definition subgroup_bool_inv (G : group) (H : subgroup_bool G) :
   subgroup_bool_els G H ->
   subgroup_bool_els G H.
 Proof.
-  intros. destruct X. destruct H. exists (gr_inv G g0).
-  apply subgr_inv_closed_b0. apply H0. Defined.
+  intros. destruct X. destruct H. exists (gr_inv G subgr_b_g0).
+  apply subgr_inv_closed_b0. apply subgr_b_H0. Defined.
+
+Lemma bool_eq_refl :
+  forall (b1 b2 : bool) (p q : b1 = b2), p = q.
+Proof.
+  intros b1 b2. destruct p. intro. symmetry. 
+  apply Eqdep_dec.UIP_refl_bool. Qed.
 
 Definition subgroup_bool_group (G : group) (H : subgroup_bool G): group.
 Proof.
   exists (subgroup_bool_els G H) (subgroup_bool_op G H)
          (subgroup_bool_id G H) (subgroup_bool_inv G H).
   - (* Associativity *)
-    admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  Admitted.
+    intros. destruct x. destruct y. destruct z.
+    destruct G; destruct H; simpl in *.
+    apply subgrp_bool_els_eq. apply gr_op_assoc0.
+  - intros. destruct x. destruct G; destruct H; simpl in *.
+    apply subgrp_bool_els_eq. apply gr_id_l0.
+  - intros. destruct x. destruct G; destruct H; simpl in *.
+    apply subgrp_bool_els_eq. apply gr_id_r0.
+  - intros. destruct x. destruct G; destruct H; simpl in *.
+    apply subgrp_bool_els_eq. simpl. apply gr_inv_l0.
+  - intros. destruct x. destruct G; destruct H; simpl in *.
+    apply subgrp_bool_els_eq. simpl. apply gr_inv_r0.
+  Qed.
 
 Record subgroup_prop (G : group) : Type := mk_subgrp_p {
   subgr_mem_p :> G -> Prop;
@@ -83,6 +105,54 @@ Record subgroup_prop (G : group) : Type := mk_subgrp_p {
     subgr_mem_p a -> subgr_mem_p (gr_inv G a)
   }.
 
+Record subgroup_prop_els (G : group) (H : subgroup_prop G) : Type := {
+  subgr_p_g :> G; subgr_p_H : H subgr_p_g }.
+
+Lemma subgrp_prop_els_eq (G : group) (g1 g2 : G) (H : subgroup_prop G)
+                         (H1 : H g1) (H2 : H g2) :
+  g1 = g2 -> {|subgr_p_g:=g1; subgr_p_H:=H1|} = {|subgr_p_g:=g2; subgr_p_H:=H2|}.
+Proof.
+  intro. subst. assert (H1 = H2). { apply proof_irrelevance. }
+  subst. reflexivity. Qed.
+
+Definition subgroup_prop_op (G : group) (H : subgroup_prop G) :
+  (subgroup_prop_els G H) ->
+  (subgroup_prop_els G H) ->
+  (subgroup_prop_els G H).
+Proof.
+  intros. destruct H. simpl. destruct X. destruct X0.
+  exists (gr_op G subgr_p_g0 subgr_p_g1). apply subgr_op_closed_p0.
+  apply subgr_p_H0. apply subgr_p_H1. Defined.
+
+Definition subgroup_prop_id (G : group) (H : subgroup_prop G) :
+  subgroup_prop_els G H.
+Proof.
+  exists (gr_id G). destruct H. apply subgr_id_p0. Defined.
+
+Definition subgroup_prop_inv (G : group) (H : subgroup_prop G) :
+  subgroup_prop_els G H ->
+  subgroup_prop_els G H.
+Proof.
+  intros. destruct X. destruct H. exists (gr_inv G subgr_p_g0).
+  apply subgr_inv_closed_p0. apply subgr_p_H0. Defined.
+
+Definition subgroup_prop_group (G : group) (H : subgroup_prop G): group.
+Proof.
+  exists (subgroup_prop_els G H) (subgroup_prop_op G H)
+         (subgroup_prop_id G H) (subgroup_prop_inv G H).
+  - (* Associativity *)
+    intros. destruct x. destruct y. destruct z.
+    destruct G; destruct H; simpl in *.
+    apply subgrp_prop_els_eq. apply gr_op_assoc0.
+  - intros. destruct x. destruct G; destruct H; simpl in *.
+    apply subgrp_prop_els_eq. apply gr_id_l0.
+  - intros. destruct x. destruct G; destruct H; simpl in *.
+    apply subgrp_prop_els_eq. apply gr_id_r0.
+  - intros. destruct x. destruct G; destruct H; simpl in *.
+    apply subgrp_prop_els_eq. simpl. apply gr_inv_l0.
+  - intros. destruct x. destruct G; destruct H; simpl in *.
+    apply subgrp_prop_els_eq. simpl. apply gr_inv_r0.
+  Qed.
 (* Instead of G->Prop, we can choose G->bool. In this case,
    Our proof that subgroup is group is simpler. However,
    this is incorrect definition, since G -> bool is implementation
