@@ -9,6 +9,7 @@ From Coq Require Import Omega.
 Axiom proof_irrelevance :
   forall (P : Prop) (p q : P), p = q.
 
+Section group_def.
 Record group : Type := mk_grp {
   gr_els :> Type;
   gr_op : gr_els -> gr_els -> gr_els;
@@ -26,12 +27,9 @@ Record abel_group : Type := mk_abl_grp {
   ab_abelian : forall x y, gr_op ab_gr x y = gr_op ab_gr y x
   }.
 
-Record finite_evid (X : Type) : Type := mk_fin_evid {
-  fin_enum : list X;
-  is_enum : forall x, In x fin_enum;
-  is_unique : NoDup fin_enum
-  }.
+End group_def.
 
+Section subgroup.
 Record subgroup_bool (G : group) : Type := mk_subgrp_b {
   subgr_mem_b :> G -> bool;
   subgr_id_b : subgr_mem_b (gr_id G) = true;
@@ -176,17 +174,6 @@ Proof.
    https://hott.github.io/HoTT/coqdoc-html/HoTT.Truncations.Core.html
  *)
 
-Record grp_homo (G1 G2 : group) : Type := mk_grp_homo {
-  grp_homo_f :> G1 -> G2;
-  is_homo : forall x y, grp_homo_f (gr_op G1 x y) = gr_op G2 (grp_homo_f x) (grp_homo_f y)
-  }.
-
-Record grp_iso (G1 G2 : group) : Type := mk_grp_iso {
-  grp_iso_f :> grp_homo G1 G2;
-  grp_iso_inj : forall x y, grp_iso_f x = grp_iso_f y -> x = y;
-  grp_iso_sur : forall y, exists x, grp_iso_f x = y
-  }.
-
 Inductive subgrp_gen (G : group) (S : G -> Prop) : G -> Prop :=
 | subgrp_gen_base (g : G) (H : S g) : subgrp_gen G S g
 | subgrp_gen_add (g1 g2 : G) (H1 : subgrp_gen G S g1) (H2 : subgrp_gen G S g2) :
@@ -216,6 +203,20 @@ Proof.
   - destruct H; simpl in *. apply subgr_inv_closed_p0.
     assumption.
   Qed.
+End subgroup.
+
+Section homomorphism.
+Record grp_homo (G1 G2 : group) : Type := mk_grp_homo {
+  grp_homo_f :> G1 -> G2;
+  is_homo : forall x y, grp_homo_f (gr_op G1 x y) = gr_op G2 (grp_homo_f x) (grp_homo_f y)
+  }.
+
+Record grp_iso (G1 G2 : group) : Type := mk_grp_iso {
+  grp_iso_f :> grp_homo G1 G2;
+  grp_iso_inj : forall x y, grp_iso_f x = grp_iso_f y -> x = y;
+  grp_iso_sur : forall y, exists x, grp_iso_f x = y
+  }.
+End homomorphism.
 
 
 
