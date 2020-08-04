@@ -187,8 +187,35 @@ Record grp_iso (G1 G2 : group) : Type := mk_grp_iso {
   grp_iso_sur : forall y, exists x, grp_iso_f x = y
   }.
 
+Inductive subgrp_gen (G : group) (S : G -> Prop) : G -> Prop :=
+| subgrp_gen_base (g : G) (H : S g) : subgrp_gen G S g
+| subgrp_gen_add (g1 g2 : G) (H1 : subgrp_gen G S g1) (H2 : subgrp_gen G S g2) :
+                 subgrp_gen G S (gr_op G g1 g2)
+| subgrp_gen_inv (g : G) (H : subgrp_gen G S g) : subgrp_gen G S (gr_inv G g).
 
+Definition subgrp_generate (G : group) (S : G -> Prop) (g : G) (H : S g) : subgroup_prop G.
+  exists (subgrp_gen G S).
+  - pose proof (subgrp_gen_base G S g H).
+    pose proof (subgrp_gen_inv G S g H0).
+    pose proof (subgrp_gen_add G S g (gr_inv G g) H0 H1).
+    destruct G; simpl in *.
+    replace (gr_op0 g (gr_inv0 g)) with (gr_id0) in H2.
+    apply H2. auto.
+  - intros. apply subgrp_gen_add; assumption.
+  - intros. apply subgrp_gen_inv; assumption.
+  Defined.
 
+Lemma subgrp_generate_correct (G : group) :
+  forall (S : G -> Prop) (H : subgroup_prop G),
+  (forall g, S g -> H g) -> (forall g, subgrp_gen G S g -> H g).
+Proof.
+  intros. induction H1.
+  - apply H0. apply H1.
+  - destruct H; simpl in *. apply subgr_op_closed_p0.
+    assumption. assumption.
+  - destruct H; simpl in *. apply subgr_inv_closed_p0.
+    assumption.
+  Qed.
 
 
 
