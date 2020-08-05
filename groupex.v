@@ -1,5 +1,6 @@
 From GRP Require Export group.
 From Coq Require Import Lists.List.
+From Coq Require Import Logic.FunctionalExtensionality.
 From Coq Require Import Omega.
 
 Record finite_evid (X : Type) : Type := mk_fin_evid {
@@ -63,14 +64,86 @@ Definition fin_grp (n : nat) : group.
 
 End finite_cyclic_group.
 
+Section dihedral_group.
+
+Inductive dihedral_els (n : nat) : Type :=
+| clockwise (o : fin_ord n) : dihedral_els n
+| counterclockwise (o : fin_ord n) : dihedral_els n.
+
+
+
+End dihedral_group.
+
 Section symmetric_group.
-(* The main hard point here is to construct inverse of function.
+(* 
+   The main hard point here is to construct inverse of function.
    In specific, we require axiom of dependent choice which is not compuatble.
    If we restrict our viewpoint to symmetric group over Z_n, it is a lot simpler,
-   we have library that allows finite choice.
+   we have library that allows finite choice (which is computable).
  *)
 
+Record invertible_function (A : Type) : Type := mk_invert {
+  invert_f : A -> A;
+  invert_g : A -> A;
+  left_inv : forall a, invert_f (invert_g a) = a;
+  right_inv : forall a, invert_g (invert_f a) = a
+}.
 
+Lemma invertible_function_eq (A : Type) :
+  forall (f1 f2 g1 g2 : A -> A) 
+         (Hl1 : forall a, f1 (g1 a) = a)
+         (Hl2 : forall a, f2 (g2 a) = a)
+         (Hr1 : forall a, g1 (f1 a) = a)
+         (Hr2 : forall a, g2 (f2 a) = a),
+    f1 = f2 -> g1 = g2 -> 
+    mk_invert A f1 g1 Hl1 Hr1 = mk_invert A f2 g2 Hl2 Hr2.
+Proof.
+  intros. subst. assert (Hl1 = Hl2) by apply proof_irrelevance.
+  assert (Hr1 = Hr2) by apply proof_irrelevance. subst.
+  reflexivity. Defined.
+
+Definition compose_invertible_function (A : Type) 
+   : invertible_function A -> invertible_function A -> invertible_function A.
+Proof.
+  intros. destruct X. destruct X0.
+  exists (fun a => invert_f1 (invert_f0 a)) (fun a => invert_g0 (invert_g1 a)).
+  - intros. rewrite left_inv0. rewrite left_inv1. reflexivity.
+  - intros. rewrite right_inv1. rewrite right_inv0. reflexivity.
+  Defined.
+
+Definition id_invertible_function (A : Type) : invertible_function A.
+Proof.
+  exists (fun a => a) (fun a => a).
+  all : reflexivity. Defined.
+
+Definition inv_invertible_function (A : Type) (a : invertible_function A) 
+                                   : invertible_function A.
+Proof.
+  exists (invert_g A a) (invert_f A a).
+  - apply (right_inv A a).
+  - apply (left_inv A a).
+  Defined.
+
+Definition symmetric_group (A : Type) : group.
+  exists (invertible_function A) (compose_invertible_function A)
+  (id_invertible_function A) (inv_invertible_function A).
+  - intros. destruct x. destruct y. destruct z. simpl in *.
+    apply invertible_function_eq.
+    + reflexivity.
+    + reflexivity.
+  - intros. destruct x. simpl in *. apply invertible_function_eq.
+    + apply functional_extensionality. reflexivity.
+    + apply functional_extensionality. reflexivity.
+  - intros. destruct x. simpl in *. apply invertible_function_eq.
+    + apply functional_extensionality. reflexivity.
+    + apply functional_extensionality. reflexivity.
+  - intros. destruct x. simpl in *. apply invertible_function_eq.
+    + apply functional_extensionality. assumption.
+    + apply functional_extensionality. assumption.
+  - intros. destruct x. simpl in *. apply invertible_function_eq.
+    + apply functional_extensionality. assumption.
+    + apply functional_extensionality. assumption.
+  Defined.
 
 End symmetric_group.
 
