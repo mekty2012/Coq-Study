@@ -218,6 +218,38 @@ Record grp_iso (G1 G2 : group) : Type := mk_grp_iso {
   }.
 End homomorphism.
 
+Section construction.
 
+Definition direct_product (A : group) (B : group) : group.
+  exists (prod A B) 
+         (fun p1 => fun p2 =>
+           match p1 with
+           | pair a1 b1 =>
+             match p2 with
+             | pair a2 b2 =>
+               pair (gr_op A a1 a2) (gr_op B b1 b2)
+             end
+           end)
+         (pair (gr_id A) (gr_id B))
+         (fun p =>
+           match p with
+           | pair a b => pair (gr_inv A a) (gr_inv B b)
+           end).
+  - intros. destruct x. destruct y. destruct z.
+    rewrite (gr_op_assoc A). rewrite (gr_op_assoc B).
+    reflexivity.
+  - intros. destruct x. rewrite (gr_id_l A). rewrite (gr_id_l B).
+    reflexivity.
+  - intros. destruct x. rewrite (gr_id_r A). rewrite (gr_id_r B).
+    reflexivity.
+  - intros. destruct x. rewrite (gr_inv_l A). rewrite (gr_inv_l B).
+    reflexivity.
+  - intros. destruct x. rewrite (gr_inv_r A). rewrite (gr_inv_r B).
+    reflexivity.
+  Defined.
+
+
+
+End construction.
 
 
