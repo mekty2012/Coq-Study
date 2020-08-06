@@ -1,6 +1,6 @@
 From GRP Require Export group.
 
-Lemma grp_identitiy_unique :
+Lemma grp_identity_unique :
   forall G g0, (forall g, gr_op G g g0 = g) -> (forall g, gr_op G g0 g = g) -> g0 = gr_id G.
 Proof.
   intros.
@@ -42,6 +42,14 @@ Proof.
     rewrite gr_inv_l. rewrite gr_id_l. rewrite gr_inv_l. reflexivity.
   Qed.
 
+Lemma grp_id_inv_id :
+  forall G, gr_inv G (gr_id G) = gr_id G.
+Proof.
+  intros. symmetry. apply grp_inv_unique.
+  - apply gr_id_l.
+  - apply gr_id_l.
+  Qed.
+
 Lemma grp_right_cancel :
   forall G g1 g2 x, gr_op G g1 x = gr_op G g2 x -> g1 = g2.
 Proof.
@@ -66,6 +74,10 @@ Proof.
   apply H0.
   Qed.
 
-
+Fixpoint mult {G : group} (g : G) (n : nat) : G :=
+  match n with
+  | 0 => gr_id G
+  | S n' => gr_op G g (mult g n')
+  end.
 
 

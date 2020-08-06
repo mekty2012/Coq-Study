@@ -208,7 +208,9 @@ End subgroup.
 Section homomorphism.
 Record grp_homo (G1 G2 : group) : Type := mk_grp_homo {
   grp_homo_f :> G1 -> G2;
-  is_homo : forall x y, grp_homo_f (gr_op G1 x y) = gr_op G2 (grp_homo_f x) (grp_homo_f y)
+  preserves_op : forall x y, 
+                 grp_homo_f (gr_op G1 x y) = gr_op G2 (grp_homo_f x) (grp_homo_f y);
+  preserves_inv : forall x, grp_homo_f (gr_inv G1 x) = gr_inv G2 (grp_homo_f x)
   }.
 
 Record grp_iso (G1 G2 : group) : Type := mk_grp_iso {
@@ -285,6 +287,15 @@ Theorem indexed_direct_product_univ :
       forall (g : G),
         forall (a : A), (f g) a = (fun_fam a) g).
 Proof.
+  Admitted.
+
+Definition pullback (G1 G2 G : group) (f1 : grp_homo G1 G) (f2 : grp_homo G2 G) 
+       : subgroup_prop (direct_product G1 G2).
+Proof.
+  exists (fun p => match p with | pair g1 g2 => f1 g1 = f2 g2 end).
+  - admit.
+  - admit.
+  - admit.
   Admitted.
 
 End construction.
