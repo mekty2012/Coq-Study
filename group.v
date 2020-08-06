@@ -248,7 +248,44 @@ Definition direct_product (A : group) (B : group) : group.
     reflexivity.
   Defined.
 
+(* Prove universal properties of direct product. *)
 
+Theorem direct_product_univ :
+  forall (G1 G2 : group),
+  (forall (G : group), forall (f1 : grp_homo G G1) (f2 : grp_homo G G2),
+    exists (f : grp_homo G (direct_product G1 G2)),
+      forall (g : G),
+        pair (f1 g) (f2 g) = f g).
+Proof.
+  Admitted.
+
+Definition indexed_direct_product {A : Type} (ind : A -> group) : group.
+  exists (forall (a : A), ind a)
+         (fun f1 => fun f2 =>
+           fun a => (gr_op (ind a) (f1 a) (f2 a)))
+         (fun a => (gr_id (ind a)))
+         (fun f => fun a => (gr_inv (ind a) (f a)))
+  .
+  - intros. apply functional_extensionality_dep.
+    intro. apply (gr_op_assoc (ind x0)).
+  - intros. apply functional_extensionality_dep.
+    intro. apply (gr_id_l (ind x0)).
+  - intros. apply functional_extensionality_dep.
+    intro. apply (gr_id_r (ind x0)).
+  - intros. apply functional_extensionality_dep.
+    intro. apply (gr_inv_l (ind x0)).
+  - intros. apply functional_extensionality_dep.
+    intro. apply (gr_inv_r (ind x0)).
+  Defined.
+
+Theorem indexed_direct_product_univ :
+  forall (A : Type) (ind : A -> group),
+  (forall (G : group), forall (fun_fam : forall (a : A), grp_homo G (ind a)),
+    exists (f : grp_homo G (indexed_direct_product ind)),
+      forall (g : G),
+        forall (a : A), (f g) a = (fun_fam a) g).
+Proof.
+  Admitted.
 
 End construction.
 
