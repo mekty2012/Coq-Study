@@ -150,7 +150,7 @@ Proof.
     apply subgrp_prop_els_eq. simpl. apply gr_inv_l0.
   - intros. destruct x. destruct G; destruct H; simpl in *.
     apply subgrp_prop_els_eq. simpl. apply gr_inv_r0.
-  Qed.
+  Defined.
 (* Instead of G->Prop, we can choose G->bool. In this case,
    Our proof that subgroup is group is simpler. However,
    this is incorrect definition, since G -> bool is implementation
@@ -218,6 +218,23 @@ Record grp_iso (G1 G2 : group) : Type := mk_grp_iso {
   grp_iso_inj : forall x y, grp_iso_f x = grp_iso_f y -> x = y;
   grp_iso_sur : forall y, exists x, grp_iso_f x = y
   }.
+
+Definition subgroup_injection (G : group) (H : subgroup_prop G) 
+                             : grp_homo (subgroup_prop_group G H) G.
+Proof.
+  exists (fun (h : subgroup_prop_group G H) => subgr_p_g G H h).
+  - intros. destruct H. destruct x. destruct y. simpl in *. reflexivity.
+  - intros. destruct H. destruct x. simpl in *. reflexivity.
+  Defined.
+
+Lemma subgroup_injection_injective :
+  forall (G : group) (H : subgroup_prop G),
+    forall (h1 h2 : subgroup_prop_group G H),
+       (subgroup_injection G H) h1 = (subgroup_injection G H) h2 ->
+         h1 = h2.
+Proof.
+  Admitted.
+
 End homomorphism.
 
 Section construction.
