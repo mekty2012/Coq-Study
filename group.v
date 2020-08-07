@@ -2,12 +2,10 @@ From Coq Require Import Arith.Arith.
 From Coq Require Import Bool.Bool.
 Require Export Coq.Strings.String.
 From Coq Require Import Logic.FunctionalExtensionality.
+From Coq Require Import Logic.ProofIrrelevance.
 From Coq Require Import Lists.List.
 Import ListNotations.
 From Coq Require Import Omega.
-
-Axiom proof_irrelevance :
-  forall (P : Prop) (p q : P), p = q.
 
 Section group_def.
 Record group : Type := mk_grp {
@@ -42,13 +40,6 @@ Record subgroup_bool (G : group) : Type := mk_subgrp_b {
 Record subgroup_bool_els (G : group) (H : subgroup_bool G) : Type := {
   subgr_b_g :> G; subgr_b_H : H subgr_b_g = true }.
 
-Lemma subgrp_bool_els_eq (G : group) (g1 g2 : G) (H : subgroup_bool G)
-                         (H1 : H g1 = true) (H2 : H g2 = true) :
-  g1 = g2 -> {|subgr_b_g:=g1; subgr_b_H:=H1|} = {|subgr_b_g:=g2; subgr_b_H:=H2|}.
-Proof.
-  intro. subst. assert (H1 = H2). { apply proof_irrelevance. }
-  subst. reflexivity. Qed.
-
 Definition subgroup_bool_op (G : group) (H : subgroup_bool G) :
   (subgroup_bool_els G H) ->
   (subgroup_bool_els G H) ->
@@ -70,11 +61,41 @@ Proof.
   intros. destruct X. destruct H. exists (gr_inv G subgr_b_g0).
   apply subgr_inv_closed_b0. apply subgr_b_H0. Defined.
 
-Lemma bool_eq_refl :
-  forall (b1 b2 : bool) (p q : b1 = b2), p = q.
+Definition true_eq_unique (p q : true = true) : p = q :=
+  match p with
+  | eq_refl =>
+    match q with
+    | eq_refl => eq_refl
+    end
+  end.
+
+Definition false_eq_unique (p q : false = false) : p = q :=
+  match p with
+  | eq_refl =>
+    match q with
+    | eq_refl => eq_refl
+    end
+  end.
+
+Theorem bool_eq_unique :
+  forall (b1 b2 : bool),
+    forall (p q : b1 = b2),
+      p = q.
 Proof.
-  intros b1 b2. destruct p. intro. symmetry. 
-  apply Eqdep_dec.UIP_refl_bool. Qed.
+  intros [] [].
+  - intros. apply true_eq_unique.
+  - intros; discriminate.
+  - intros; discriminate.
+  - intros. apply false_eq_unique.
+  Qed.
+
+Lemma subgrp_bool_els_eq (G : group) (g1 g2 : G) (H : subgroup_bool G)
+                         (H1 : H g1 = true) (H2 : H g2 = true) :
+  g1 = g2 -> {|subgr_b_g:=g1; subgr_b_H:=H1|} = {|subgr_b_g:=g2; subgr_b_H:=H2|}.
+Proof.
+  intro. subst. assert (H1 = H2). 
+  { apply bool_eq_unique. }
+  subst. reflexivity. Qed.
 
 Definition subgroup_bool_group (G : group) (H : subgroup_bool G): group.
 Proof.
