@@ -113,7 +113,7 @@ Proof.
     apply subgrp_bool_els_eq. simpl. apply gr_inv_l0.
   - intros. destruct x. destruct G; destruct H; simpl in *.
     apply subgrp_bool_els_eq. simpl. apply gr_inv_r0.
-  Qed.
+  Defined.
 
 Record subgroup_prop (G : group) : Type := mk_subgrp_p {
   subgr_mem_p :> G -> Prop;
@@ -172,6 +172,31 @@ Proof.
   - intros. destruct x. destruct G; destruct H; simpl in *.
     apply subgrp_prop_els_eq. simpl. apply gr_inv_r0.
   Defined.
+
+Lemma subgr_prop_only_els :
+  forall (G : group) 
+         (H : subgroup_prop G) 
+         (P : subgroup_prop_els G H -> Prop) 
+         (g : G) 
+         (h : H g),
+    P {|subgr_p_g:=g;subgr_p_H:=h|} -> 
+      forall (h' : H g), P {|subgr_p_g:=g;subgr_p_H:=h'|}.
+Proof.
+  intros. assert (h = h') by apply proof_irrelevance. subst. apply H0. Qed.
+
+Definition subgroup_transitive (G : group)
+                               (H1 : subgroup_prop G)
+                               (H2 : subgroup_prop (subgroup_prop_group G H1)) :
+                               subgroup_prop G.
+Proof.
+  exists (fun g => exists (H : H1 g), H2 {|subgr_p_g:=g; subgr_p_H:=H|}).
+  - destruct H1. exists (subgr_id_p0).
+    destruct H2. assumption.
+  - intros. destruct H. destruct H0. destruct H1.
+    exists (subgr_op_closed_p0 a b x x0).
+    simpl in *. destruct H2; simpl in *.
+    Abort.
+
 (* Instead of G->Prop, we can choose G->bool. In this case,
    Our proof that subgroup is group is simpler. However,
    this is incorrect definition, since G -> bool is implementation
