@@ -148,7 +148,112 @@ Definition symmetric_group (A : Type) : group.
 
 End symmetric_group.
 
+Section Quaternion.
 
+Inductive quat : Type :=
+  | one
+  | i
+  | j
+  | k
+  | M_one
+  | M_i
+  | M_j
+  | M_k
+  .
 
+Definition quat_op (q1 q2 : quat) : quat :=
+  match q1 with
+  | one => q2
+  | i => match q2 with
+          | one => i
+          | i => M_one
+          | j => k
+          | k => M_j
+          | M_one => M_i
+          | M_i => one
+          | M_j => M_k
+          | M_k => j
+         end
+  | j => match q2 with 
+          | one => j
+          | i => M_k
+          | j => M_one
+          | k => i
+          | M_one => M_j
+          | M_i => k
+          | M_j => one
+          | M_k => M_i
+         end
+  | k => match q2 with 
+          | one => k
+          | i => j
+          | j => M_i
+          | k => M_one
+          | M_one => M_k
+          | M_i => M_j
+          | M_j => i
+          | M_k => one
+         end
+  | M_one => match q2 with 
+          | one => M_one
+          | i => M_i
+          | j => M_j
+          | k => M_k
+          | M_one => one
+          | M_i => i
+          | M_j => j
+          | M_k => k
+         end
+  | M_i => match q2 with
+          | one => M_i
+          | i => one
+          | j => M_k
+          | k => j
+          | M_one => i
+          | M_i => M_one
+          | M_j => k
+          | M_k => M_j
+         end
+  | M_j => match q2 with 
+          | one => M_j
+          | i => k
+          | j => one
+          | k => M_i
+          | M_one => j
+          | M_i => M_k
+          | M_j => M_one
+          | M_k => i
+         end
+  | M_k => match q2 with 
+          | one => M_k
+          | i => M_j
+          | j => i
+          | k => one
+          | M_one => k
+          | M_i => j
+          | M_j => M_i
+          | M_k => M_one
+         end
+  end.
 
+Definition quat_inv (q:quat) : quat :=
+  match q with
+  | one => one
+  | i => M_i
+  | j => M_j
+  | k => M_k
+  | M_one => M_one
+  | M_i => i
+  | M_j => j
+  | M_k => k
+  end.
+
+Definition quaternion_group : group.
+  exists quat (quat_op) one (quat_inv).
+  - intros [] [] []. all : reflexivity.
+  - intros []. all : reflexivity.
+  - intros []. all : reflexivity.
+  - intros []. all : reflexivity.
+  - intros []. all : reflexivity.
+Defined.
 
