@@ -278,7 +278,7 @@ Lemma subgroup_injection_injective :
     forall (h1 h2 : subgroup_prop_group G H),
        (subgroup_injection G H) h1 = (subgroup_injection G H) h2 ->
          h1 = h2.
-Proof.
+Proof. intros. destruct H. simpl in *. 
   Admitted.
 
 End homomorphism.
@@ -315,6 +315,13 @@ Definition direct_product (A : group) (B : group) : group.
 
 (* Prove universal properties of direct product. *)
 
+Definition direct_product_univ_make (G1 G2 G : group) (f1 : grp_homo G G1) (f2 : grp_homo G G2): grp_homo G (direct_product G1 G2).
+Proof.
+  exists (fun g => pair (f1 g) (f2 g)).
+  - intros. simpl in *. destruct f1, f2. simpl in *. rewrite preserves_op0. rewrite preserves_op1. reflexivity.
+  - intros. simpl in *. destruct f1, f2. simpl in *. rewrite preserves_inv0. rewrite preserves_inv1. reflexivity.
+  Defined.
+
 Theorem direct_product_univ :
   forall (G1 G2 : group),
   (forall (G : group), forall (f1 : grp_homo G G1) (f2 : grp_homo G G2),
@@ -322,7 +329,8 @@ Theorem direct_product_univ :
       forall (g : G),
         pair (f1 g) (f2 g) = f g).
 Proof.
-  Admitted.
+  intros. exists (direct_product_univ_make G1 G2 G f1 f2). reflexivity.
+Qed.
 
 Definition indexed_direct_product {A : Type} (ind : A -> group) : group.
   exists (forall (a : A), ind a)
@@ -343,6 +351,12 @@ Definition indexed_direct_product {A : Type} (ind : A -> group) : group.
     intro. apply (gr_inv_r (ind x0)).
   Defined.
 
+Definition indexed_direct_product_univ_make (A : Type) (ind : A -> group) (G: group) (fun_fam : forall (a : A), grp_homo G (ind a)) : grp_homo G (indexed_direct_product ind).
+  exists (fun g : G => fun a : A => (fun_fam a) g).
+  - intros. simpl in *. apply functional_extensionality_dep. intros. apply fun_fam.
+  - intros. simpl in *. apply functional_extensionality_dep. intros. apply fun_fam.
+Defined.
+
 Theorem indexed_direct_product_univ :
   forall (A : Type) (ind : A -> group),
   (forall (G : group), forall (fun_fam : forall (a : A), grp_homo G (ind a)),
@@ -350,7 +364,8 @@ Theorem indexed_direct_product_univ :
       forall (g : G),
         forall (a : A), (f g) a = (fun_fam a) g).
 Proof.
-  Admitted.
+  intros. exists (indexed_direct_product_univ_make A ind G fun_fam). intros. simpl. reflexivity.
+Qed.
 
 Definition pullback (G1 G2 G : group) (f1 : grp_homo G1 G) (f2 : grp_homo G2 G) 
        : subgroup_prop (direct_product G1 G2).
