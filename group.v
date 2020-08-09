@@ -278,8 +278,11 @@ Lemma subgroup_injection_injective :
     forall (h1 h2 : subgroup_prop_group G H),
        (subgroup_injection G H) h1 = (subgroup_injection G H) h2 ->
          h1 = h2.
-Proof. intros. destruct H. simpl in *. 
-  Admitted.
+Proof. 
+  intros. simpl in H0. destruct h1. destruct h2.
+  apply subgrp_prop_els_eq.
+  simpl in H0. apply H0.
+  Qed.
 
 End homomorphism.
 
