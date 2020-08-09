@@ -195,7 +195,7 @@ Proof.
   - intros. destruct H. destruct H0. destruct H1.
     exists (subgr_op_closed_p0 a b x x0).
     simpl in *. destruct H2; simpl in *.
-    Abort.
+Abort.
 
 (* Instead of G->Prop, we can choose G->bool. In this case,
    Our proof that subgroup is group is simpler. However,
@@ -364,7 +364,7 @@ Theorem indexed_direct_product_univ :
       forall (g : G),
         forall (a : A), (f g) a = (fun_fam a) g).
 Proof.
-  intros. exists (indexed_direct_product_univ_make A ind G fun_fam). intros. simpl. reflexivity.
+  intros. exists (indexed_direct_product_univ_make A ind G fun_fam). reflexivity.
 Qed.
 
 Definition pullback (G1 G2 G : group) (f1 : grp_homo G1 G) (f2 : grp_homo G2 G) 

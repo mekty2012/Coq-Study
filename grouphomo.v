@@ -20,7 +20,7 @@ Proof.
     rewrite H. rewrite H0. rewrite gr_id_l. reflexivity.
   - intros. rewrite preserves_inv. rewrite H.
     apply grp_id_inv_id.
-  Qed.
+  Defined.
 
 Definition image (G1 G2 : group) (f : grp_homo G1 G2) : subgroup_prop G2.
 Proof.
@@ -30,4 +30,4 @@ Proof.
     exists (gr_op G1 x x0). subst. apply preserves_op.
   - intros. destruct H. exists (gr_inv G1 x).
     subst. apply preserves_inv.
-  Qed.
+  Defined.

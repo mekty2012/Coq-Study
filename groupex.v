@@ -1,6 +1,7 @@
 From GRP Require Export group.
 From Coq Require Import Lists.List.
 From Coq Require Import Logic.FunctionalExtensionality.
+From Coq Require Import Logic.ProofIrrelevance.
 From Coq Require Import Omega.
 
 Record finite_evid (X : Type) : Type := mk_fin_evid {
