@@ -370,15 +370,38 @@ Proof.
   intros. exists (indexed_direct_product_univ_make A ind G fun_fam). reflexivity.
 Qed.
 
+Theorem homo_preserves_id' :
+  forall (G1 G2 : group) (f : grp_homo G1 G2),
+    f (gr_id G1) = gr_id G2.
+Proof.
+  intros.
+  replace (gr_id G1) with (gr_op G1 (gr_id G1) (gr_inv G1 (gr_id G1))).
+  rewrite preserves_op. rewrite preserves_inv.
+  rewrite gr_inv_r. reflexivity.
+  rewrite gr_inv_r. reflexivity.
+Qed.
+
 Definition pullback (G1 G2 G : group) (f1 : grp_homo G1 G) (f2 : grp_homo G2 G) 
        : subgroup_prop (direct_product G1 G2).
 Proof.
   exists (fun p => match p with | pair g1 g2 => f1 g1 = f2 g2 end).
-  - admit.
-  - admit.
-  - admit.
-  Admitted.
+  - simpl. rewrite homo_preserves_id'. rewrite homo_preserves_id'. reflexivity.   
+  - intros. destruct a,b. simpl in *. destruct f1,f2. simpl in *. rewrite preserves_op0. rewrite preserves_op1. rewrite H. rewrite H0. reflexivity. 
+  - intros. destruct a. simpl in *. destruct f1,f2. simpl in *. rewrite preserves_inv0. rewrite preserves_inv1. rewrite H. reflexivity.
+  Defined. 
 
 End construction.
+
+Section group_action.
+
+Record group_action (G: group) (A: Type): Type := mk_grp_act {
+  grp_act :> G -> A -> A;
+  grp_act_assoc : forall (g1 g2: G) (a : A), 
+                  grp_act g1 (grp_act g2 a) = grp_act (gr_op G g1 g2) a;
+  grp_act_id : forall (a: A),
+                 grp_act (gr_id G) a = a;
+}.
+
+End group_action.
 
 

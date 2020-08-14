@@ -148,112 +148,140 @@ Definition symmetric_group (A : Type) : group.
 
 End symmetric_group.
 
-Section Quaternion.
+Section quaternion_group.
 
 Inductive quat : Type :=
-  | one
-  | i
-  | j
-  | k
-  | M_one
-  | M_i
-  | M_j
-  | M_k
+  | quat_one
+  | quat_i
+  | quat_j
+  | quat_k
+  | M_quat_one
+  | M_quat_i
+  | M_quat_j
+  | M_quat_k
   .
 
 Definition quat_op (q1 q2 : quat) : quat :=
   match q1 with
-  | one => q2
-  | i => match q2 with
-          | one => i
-          | i => M_one
-          | j => k
-          | k => M_j
-          | M_one => M_i
-          | M_i => one
-          | M_j => M_k
-          | M_k => j
+  | quat_one=> q2
+  | quat_i=> match q2 with
+          | quat_one=> quat_i
+          | quat_i=> M_quat_one
+          | quat_j=> quat_k
+          | quat_k=> M_quat_j
+          | M_quat_one=> M_quat_i
+          | M_quat_i=> quat_one
+          | M_quat_j=> M_quat_k
+          | M_quat_k=> quat_j
          end
-  | j => match q2 with 
-          | one => j
-          | i => M_k
-          | j => M_one
-          | k => i
-          | M_one => M_j
-          | M_i => k
-          | M_j => one
-          | M_k => M_i
+  | quat_j=> match q2 with 
+          | quat_one=> quat_j
+          | quat_i=> M_quat_k
+          | quat_j=> M_quat_one
+          | quat_k=> quat_i
+          | M_quat_one=> M_quat_j
+          | M_quat_i=> quat_k
+          | M_quat_j=> quat_one
+          | M_quat_k=> M_quat_i
          end
-  | k => match q2 with 
-          | one => k
-          | i => j
-          | j => M_i
-          | k => M_one
-          | M_one => M_k
-          | M_i => M_j
-          | M_j => i
-          | M_k => one
+  | quat_k=> match q2 with 
+          | quat_one=> quat_k
+          | quat_i=> quat_j
+          | quat_j=> M_quat_i
+          | quat_k=> M_quat_one
+          | M_quat_one=> M_quat_k
+          | M_quat_i=> M_quat_j
+          | M_quat_j=> quat_i
+          | M_quat_k=> quat_one
          end
-  | M_one => match q2 with 
-          | one => M_one
-          | i => M_i
-          | j => M_j
-          | k => M_k
-          | M_one => one
-          | M_i => i
-          | M_j => j
-          | M_k => k
+  | M_quat_one=> match q2 with 
+          | quat_one=> M_quat_one
+          | quat_i=> M_quat_i
+          | quat_j=> M_quat_j
+          | quat_k=> M_quat_k
+          | M_quat_one=> quat_one
+          | M_quat_i=> quat_i
+          | M_quat_j=> quat_j
+          | M_quat_k=> quat_k
          end
-  | M_i => match q2 with
-          | one => M_i
-          | i => one
-          | j => M_k
-          | k => j
-          | M_one => i
-          | M_i => M_one
-          | M_j => k
-          | M_k => M_j
+  | M_quat_i=> match q2 with
+          | quat_one=> M_quat_i
+          | quat_i=> quat_one
+          | quat_j=> M_quat_k
+          | quat_k=> quat_j
+          | M_quat_one=> quat_i
+          | M_quat_i=> M_quat_one
+          | M_quat_j=> quat_k
+          | M_quat_k=> M_quat_j
          end
-  | M_j => match q2 with 
-          | one => M_j
-          | i => k
-          | j => one
-          | k => M_i
-          | M_one => j
-          | M_i => M_k
-          | M_j => M_one
-          | M_k => i
+  | M_quat_j=> match q2 with 
+          | quat_one=> M_quat_j
+          | quat_i=> quat_k
+          | quat_j=> quat_one
+          | quat_k=> M_quat_i
+          | M_quat_one=> quat_j
+          | M_quat_i=> M_quat_k
+          | M_quat_j=> M_quat_one
+          | M_quat_k=> quat_i
          end
-  | M_k => match q2 with 
-          | one => M_k
-          | i => M_j
-          | j => i
-          | k => one
-          | M_one => k
-          | M_i => j
-          | M_j => M_i
-          | M_k => M_one
+  | M_quat_k=> match q2 with 
+          | quat_one=> M_quat_k
+          | quat_i=> M_quat_j
+          | quat_j=> quat_i
+          | quat_k=> quat_one
+          | M_quat_one=> quat_k
+          | M_quat_i=> quat_j
+          | M_quat_j=> M_quat_i
+          | M_quat_k=> M_quat_one
          end
   end.
 
 Definition quat_inv (q:quat) : quat :=
   match q with
-  | one => one
-  | i => M_i
-  | j => M_j
-  | k => M_k
-  | M_one => M_one
-  | M_i => i
-  | M_j => j
-  | M_k => k
+  | quat_one=> quat_one
+  | quat_i=> M_quat_i
+  | quat_j=> M_quat_j
+  | quat_k=> M_quat_k
+  | M_quat_one=> M_quat_one
+  | M_quat_i=> quat_i
+  | M_quat_j=> quat_j
+  | M_quat_k=> quat_k
   end.
 
 Definition quaternion_group : group.
-  exists quat (quat_op) one (quat_inv).
+  exists quat (quat_op) quat_one(quat_inv).
   - intros [] [] []. all : reflexivity.
   - intros []. all : reflexivity.
   - intros []. all : reflexivity.
   - intros []. all : reflexivity.
   - intros []. all : reflexivity.
 Defined.
+End quaternion_group.
 
+
+Section permutation_group.
+
+Definition perm_grp_act (G : group) (g : G) (A : Type) (sig : group_action G A): A -> A :=
+(fun (a : A) => (grp_act G A sig g a)).
+
+Record perms (A : Type) : Type := mk_perm {
+  perm :> A -> A;
+  perm_inj : forall x y, perm x = perm y -> x = y;
+  perm_sur : forall y, exists x, y = perm x;
+}.
+
+Record perm_grp (G : group) (A: Type) (sig : group_action G A) : Type := mk_grp_perm {
+  grp_perm :> G -> A -> A;
+  is_action : exists g : G, grp_perm g = perm_grp_act G g A sig;
+}.
+
+Definition perm_grp_inverse {G : group} {A : Type} {sig : group_action G A} (p : perm_grp G A sig) : perm_grp G A sig.
+Proof. destruct p. destruct is_action0.
+
+
+
+
+Definition perm_group (G : group) (A: Type) (sig : group_action G A) : group.
+  exists perm_grp_act (perm_grp_act G (gr_id G) A sig) 
+
+Definition grp_perm_homo (G : group) (A : Type) (sig : group action G A): grp_homo G 
